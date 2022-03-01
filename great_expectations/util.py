@@ -1302,7 +1302,8 @@ def generate_temporary_table_name(
     default_table_name_prefix: str = "ge_temp_",
     num_digits: int = 8,
 ) -> str:
-    table_name: str = f"{default_table_name_prefix}{str(uuid.uuid4())[:num_digits]}"
+    expire_date = (date.today() + timedelta(days=3)).strftime('%Y%m%d')
+    table_name: str = f"_{expire_date}_{default_table_name_prefix}{str(uuid.uuid4())[:num_digits]}"
     return table_name
 
 
