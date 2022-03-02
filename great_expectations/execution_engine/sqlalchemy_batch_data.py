@@ -262,6 +262,9 @@ class SqlAlchemyBatchData(BatchData):
             stmt = 'CREATE VOLATILE TABLE "{temp_table_name}" AS ({query}) WITH DATA NO PRIMARY INDEX ON COMMIT PRESERVE ROWS'.format(
                 temp_table_name=temp_table_name, query=query
             )
+        elif self.sql_engine_dialect.name.lower() == "clickhouse":
+            stmt = 'CREATE TABLE dq.{temp_table_name} engine = ReplicatedMergeTree() order by tuple() AS {query}'.format(
+                temp_table_name=temp_table_name, query=query)         
         else:
             stmt = 'CREATE TEMPORARY TABLE "{temp_table_name}" AS {query}'.format(
                 temp_table_name=temp_table_name, query=query
