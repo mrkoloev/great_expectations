@@ -16,6 +16,7 @@ try:
     from sqlalchemy import Column, MetaData, String, Table, and_, column, select
     from sqlalchemy.engine.url import URL
     from sqlalchemy.exc import IntegrityError, NoSuchTableError, SQLAlchemyError
+    from sqlalchemy.sql import text
 
     make_url = import_make_url()
 except ImportError:
@@ -234,7 +235,8 @@ class DatabaseStoreBackend(StoreBackend):
     def _get(self, key):
         sel = (
             select([column("value")])
-            .select_from(self._table)
+            # .select_from(self._table)
+            .select_from(text("ge_validations_store as t"))
             .where(
                 and_(
                     *(
@@ -300,7 +302,8 @@ class DatabaseStoreBackend(StoreBackend):
     def _has_key(self, key):
         sel = (
             select([sa.func.count(column("value"))])
-            .select_from(self._table)
+            # .select_from(self._table)
+            .select_from(text("ge_validations_store as t"))
             .where(
                 and_(
                     *(
@@ -319,7 +322,8 @@ class DatabaseStoreBackend(StoreBackend):
     def list_keys(self, prefix=()):
         sel = (
             select([column(col) for col in self.key_columns])
-            .select_from(self._table)
+            # .select_from(self._table)
+            .select_from(text("ge_validations_store as t"))
             .where(
                 and_(
                     *(
