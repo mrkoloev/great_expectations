@@ -28,6 +28,10 @@ resources:
       MSSQL_PID: Developer
     ports:
       - 1433:1433
+  - container: trino
+    image: trinodb/trino:379
+    ports:
+      - 8088:8080
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
@@ -66,6 +70,12 @@ stages:
       - bash: python scripts/docs_link_checker.py -p docs -r docs -s docs --skip-external
         name: LinkChecker
 
+    - job: line_number_checker
+      condition: or(eq(stageDependencies.scope_check.changes.outputs['CheckDocsChanges.DocsChanged'], true), eq(variables.isMain, true))
+      steps:
+      - bash: python scripts/validate_docs_snippet_line_numbers.py
+        name: LineNumberChecker
+
   - stage: docusaurus_tests
     dependsOn: scope_check
     pool:
@@ -79,6 +89,7 @@ stages:
         postgres: postgres
         mysql: mysql
         mssql: mssql
+        trino: trino
 
       steps:
         - task: UsePythonVersion@0
@@ -90,7 +101,7 @@ stages:
           displayName: 'Update pip'
 
         - script: |
-            pip install --requirement requirements-dev-base.txt --requirement requirements-dev-spark.txt --requirement requirements-dev-sqlalchemy.txt --constraint constraints-dev.txt
+            pip install --requirement requirements-dev-test.txt --requirement requirements-dev-spark.txt --requirement requirements-dev-sqlalchemy.txt --constraint constraints-dev.txt
             pip install --requirement requirements.txt
             pip install .
           displayName: 'Install dependencies'
@@ -131,7 +142,7 @@ stages:
 
         - script: |
             pip install pytest pytest-azurepipelines
-            pytest -v --docs-tests -m integration --mysql --bigquery --mssql --aws tests/integration/test_script_runner.py
+            pytest -v --docs-tests -m integration --mysql --bigquery --mssql --spark --postgresql --trino --aws tests/integration/test_script_runner.py
           displayName: 'pytest'
           env:
             # snowflake credentials
@@ -152,6 +163,8 @@ stages:
             AWS_CONFIG_FILE: $(aws_authkey.secureFilePath)
             ATHENA_DB_NAME: $(ATHENA_DB_NAME)
             ATHENA_STAGING_S3: $(ATHENA_STAGING_S3)
+            ATHENA_DATA_BUCKET: $(ATHENA_DATA_BUCKET)
+            ATHENA_TEN_TRIPS_DB_NAME: $(ATHENA_TEN_TRIPS_DB_NAME)
             # GCP credentials
             GOOGLE_APPLICATION_CREDENTIALS: $(gcp_authkey.secureFilePath)
             GE_TEST_GCP_PROJECT: $(GE_TEST_GCP_PROJECT)

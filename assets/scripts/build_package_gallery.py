@@ -6,8 +6,9 @@
 import json
 import logging
 import os
-from dataclasses import asdict
 from typing import List
+
+import pip
 
 from contrib.cli.great_expectations_contrib.commands import (
     read_package_from_file,
@@ -32,7 +33,7 @@ def gather_all_contrib_package_paths() -> List[str]:
     package_paths: List[str] = []
     for root, _, files in os.walk("contrib/"):
         for file in files:
-            if file == ".great_expectations_package.json":
+            if file == "package_info.yml":
                 package_paths.append(root)
 
     logger.info(f"Found {len(package_paths)} contrib packages")
@@ -52,8 +53,9 @@ def gather_all_package_manifests(package_paths: List[str]) -> List[dict]:
     root = os.getcwd()
     for path in package_paths:
         try:
-            # Go to package, read manifest, and sync it
+            # Go to package, install deps, read manifest, and sync it
             os.chdir(path)
+            _run_pip("install -r requirements.txt")
             package_path: str = ".great_expectations_package.json"
 
             package: GreatExpectationsContribPackageManifest = read_package_from_file(
@@ -62,13 +64,13 @@ def gather_all_package_manifests(package_paths: List[str]) -> List[dict]:
             sync_package(package, package_path)
 
             # Serialize to dict to append to payload
-            json_data: dict = asdict(package)
+            json_data: dict = package.to_json_dict()
             payload.append(json_data)
             logger.info(
                 f"Successfully serialized {package.package_name} to dict and appended to manifest list"
             )
         except Exception as e:
-            logger.warning(
+            logger.error(
                 f"Something went wrong when syncing {path} and serializing to dict: {e}"
             )
         finally:
@@ -76,6 +78,14 @@ def gather_all_package_manifests(package_paths: List[str]) -> List[dict]:
             os.chdir(root)
 
     return payload
+
+
+def _run_pip(stmt: str) -> None:
+    args: List[str] = stmt.split(" ")
+    if hasattr(pip, "main"):
+        pip.main(args)
+    else:
+        pip._internal.main(args)
 
 
 def write_results_to_disk(path: str, package_manifests: List[dict]) -> None:
@@ -97,6 +107,9 @@ if __name__ == "__main__":
         os.chdir(root)
         package_paths = gather_all_contrib_package_paths()
         payload = gather_all_package_manifests(package_paths)
+        assert (
+            len(payload) > 0
+        ), "Something went wrong; there should packages in the payload!"
         write_results_to_disk(os.path.join(pwd, "./package_manifests.json"), payload)
     finally:
         os.chdir(pwd)

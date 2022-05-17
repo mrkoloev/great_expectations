@@ -38,7 +38,7 @@ class ValidationResultsPageRenderer(Renderer):
         column_section_renderer=None,
         run_info_at_end: bool = False,
         data_context=None,
-    ):
+    ) -> None:
         """
         Args:
             column_section_renderer:
@@ -362,7 +362,7 @@ class ValidationResultsPageRenderer(Renderer):
             + str(expectation_suite_name).split(".")
         )
         expectation_suite_path = (
-            os.path.join(*expectation_suite_path_components) + ".html"
+            f"{os.path.join(*expectation_suite_path_components)}.html"
         )
         # TODO: deprecate dual batch api support in 0.14
         batch_kwargs = (
@@ -609,7 +609,7 @@ class ValidationResultsPageRenderer(Renderer):
                 if key == "success_percent":
                     # table_rows.append([value, "{0:.2f}%".format(statistics[key])])
                     table_rows.append(
-                        [value, num_to_str(statistics[key], precision=4) + "%"]
+                        [value, f"{num_to_str(statistics[key], precision=4)}%"]
                     )
                 else:
                     table_rows.append([value, statistics[key]])
@@ -643,7 +643,7 @@ class ValidationResultsPageRenderer(Renderer):
 
 
 class ExpectationSuitePageRenderer(Renderer):
-    def __init__(self, column_section_renderer=None):
+    def __init__(self, column_section_renderer=None) -> None:
         super().__init__()
         if column_section_renderer is None:
             column_section_renderer = {
@@ -705,7 +705,7 @@ class ExpectationSuitePageRenderer(Renderer):
         return RenderedDocumentContent(
             **{
                 "renderer_type": "ExpectationSuitePageRenderer",
-                "page_title": "Expectations / " + str(expectation_suite_name),
+                "page_title": f"Expectations / {str(expectation_suite_name)}",
                 "expectation_suite_name": expectation_suite_name,
                 "utm_medium": "expectation-suite-page",
                 "sections": sections,
@@ -895,7 +895,9 @@ class ExpectationSuitePageRenderer(Renderer):
 
 
 class ProfilingResultsPageRenderer(Renderer):
-    def __init__(self, overview_section_renderer=None, column_section_renderer=None):
+    def __init__(
+        self, overview_section_renderer=None, column_section_renderer=None
+    ) -> None:
         super().__init__()
         if overview_section_renderer is None:
             overview_section_renderer = {
@@ -987,12 +989,12 @@ class ProfilingResultsPageRenderer(Renderer):
         if run_name_as_time != run_time_datetime and run_name_as_time != "__none__":
             include_run_name = True
 
-        page_title = "Profiling Results / " + str(expectation_suite_name)
+        page_title = f"Profiling Results / {str(expectation_suite_name)}"
         if data_asset_name:
-            page_title += " / " + str(data_asset_name)
+            page_title += f" / {str(data_asset_name)}"
         if include_run_name:
-            page_title += " / " + str(run_name)
-        page_title += " / " + str(run_time)
+            page_title += f" / {str(run_name)}"
+        page_title += f" / {str(run_time)}"
 
         return RenderedDocumentContent(
             **{

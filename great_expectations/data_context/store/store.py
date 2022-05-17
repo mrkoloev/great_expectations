@@ -30,7 +30,7 @@ class Store:
 
     def __init__(
         self, store_backend=None, runtime_environment=None, store_name="no_store_name"
-    ):
+    ) -> None:
         """
         Runtime environment may be necessary to instantiate store backend elements.
         Args:
@@ -74,8 +74,7 @@ class Store:
             return
         elif not isinstance(key, self.key_class):
             raise TypeError(
-                "key must be an instance of %s, not %s"
-                % (self.key_class.__name__, type(key))
+                f"key must be an instance of {self.key_class.__name__}, not {type(key)}"
             )
 
     @property
@@ -178,7 +177,7 @@ class Store:
                 return self._store_backend.has_key(key.to_fixed_length_tuple())
             return self._store_backend.has_key(key.to_tuple())
 
-    def self_check(self, pretty_print):
+    def self_check(self, pretty_print) -> None:
         NotImplementedError(
             f"The test method is not implemented for Store class {self.__class__.__name__}."
         )

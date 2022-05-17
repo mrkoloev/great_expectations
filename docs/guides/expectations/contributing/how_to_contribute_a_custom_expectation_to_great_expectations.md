@@ -24,14 +24,14 @@ document on [levels of maturity for Expectations](../../../contributing/contribu
 If you call the `print_diagnostic_checklist()` method on your Custom Expectation, you should see a checklist similar to this one:
 
 ```
-✔ Has a library_metadata object
+✔ Has a valid library_metadata object
 ✔ Has a docstring, including a one-line short description
   ...
 ✔ Has at least one positive and negative example case, and all test cases pass
 ✔ Has core logic and passes tests on at least one Execution Engine
   ...
 ✔ Has basic input validation and type checking
-✔ Has all three statement Renderers: descriptive, prescriptive, diagnostic
+✔ Has both statement Renderers: prescriptive and diagnostic
 ✔ Has core logic that passes tests for all applicable Execution Engines and SQL dialects
   ...
 ✔ Passes all linting checks
@@ -56,7 +56,6 @@ Ensure that your Custom Expectation's `library_metadata` has correct information
 - `contributors`: You and anyone else who helped you create this Custom Expectation.
 - `tags`: These are simple descriptors of your Custom Expectation's functionality and domain (`statistics`, `flexible comparisons`, `geography`, etc.).
 - `requirements`: If your Custom Expectation relies on any third-party packages, verify that those dependencies are listed here.
-- `package` (optional): If you're contributing to a specific package, be sure to list it here!
 
 <details>
 <summary>Packages?</summary>

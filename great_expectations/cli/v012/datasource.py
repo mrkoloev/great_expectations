@@ -5,7 +5,6 @@ import os
 import platform
 import sys
 import textwrap
-import uuid
 
 import click
 
@@ -78,7 +77,7 @@ class SupportedDatabases(enum.Enum):
 
 
 @click.group()
-def datasource():
+def datasource() -> None:
     """Datasource operations"""
     pass
 
@@ -90,7 +89,7 @@ def datasource():
     default=None,
     help="The project's great_expectations directory.",
 )
-def datasource_new(directory):
+def datasource_new(directory) -> None:
     """Add a new datasource to the data context."""
     context = toolkit.load_data_context_with_error_handling(directory)
     datasource_name, data_source_type = add_datasource(context)
@@ -121,23 +120,21 @@ def datasource_new(directory):
     help="The project's great_expectations directory.",
 )
 @click.argument("datasource")
-def delete_datasource(directory, datasource):
+def delete_datasource(directory, datasource) -> None:
     """Delete the datasource specified as an argument"""
     context = toolkit.load_data_context_with_error_handling(directory)
     try:
         context.delete_datasource(datasource)
     except ValueError:
-        cli_message(
-            "<red>{}</red>".format(f"Datasource {datasource} could not be found.")
-        )
+        cli_message(f"<red>Datasource {datasource} could not be found.</red>")
         sys.exit(1)
     try:
         context.get_datasource(datasource)
     except ValueError:
-        cli_message("<green>{}</green>".format("Datasource deleted successfully."))
+        cli_message("<green>Datasource deleted successfully.</green>")
         sys.exit(1)
     else:
-        cli_message("<red>{}</red>".format("Datasource not deleted."))
+        cli_message("<red>Datasource not deleted.</red>")
         sys.exit(1)
 
 
@@ -148,7 +145,7 @@ def delete_datasource(directory, datasource):
     default=None,
     help="The project's great_expectations directory.",
 )
-def datasource_list(directory):
+def datasource_list(directory) -> None:
     """List known datasources."""
     context = toolkit.load_data_context_with_error_handling(directory)
     datasources = context.list_datasources()
@@ -237,7 +234,7 @@ def datasource_profile(
     view,
     additional_batch_kwargs,
     assume_yes,
-):
+) -> None:
     """
     Profile a datasource (Experimental)
 
@@ -411,7 +408,7 @@ def _add_pandas_datasource(
         else:
             basenamepath = path
 
-        datasource_name = os.path.basename(basenamepath) + "__dir"
+        datasource_name = f"{os.path.basename(basenamepath)}__dir"
         if prompt_for_datasource_name:
             datasource_name = click.prompt(
                 msg_prompt_datasource_name, default=datasource_name
@@ -553,7 +550,7 @@ def _add_sqlalchemy_datasource(context, prompt_for_datasource_name=True):
             )
 
             configuration = SqlAlchemyDatasource.build_configuration(
-                credentials="${" + datasource_name + "}"
+                credentials=f"${{{datasource_name}}}"
             )
 
             configuration["class_name"] = "SqlAlchemyDatasource"
@@ -595,7 +592,7 @@ The credentials will be saved in uncommitted/config_variables.yml under the key 
                     module_name="great_expectations.datasource",
                     class_name="SqlAlchemyDatasource",
                     data_asset_type={"class_name": "SqlAlchemyDataset"},
-                    credentials="${" + datasource_name + "}",
+                    credentials=f"${{{datasource_name}}}",
                 )
                 # TODO this message about continuing may not be accurate
                 cli_message(
@@ -906,7 +903,7 @@ def _add_spark_datasource(
         else:
             basenamepath = path
 
-        datasource_name = os.path.basename(basenamepath) + "__dir"
+        datasource_name = f"{os.path.basename(basenamepath)}__dir"
         if prompt_for_datasource_name:
             datasource_name = click.prompt(
                 msg_prompt_datasource_name, default=datasource_name
@@ -973,7 +970,7 @@ def select_batch_kwargs_generator(
             ]
         )
         option_selection = click.prompt(
-            msg_prompt_select_generator + "\n" + choices,
+            f"{msg_prompt_select_generator}\n{choices}",
             type=click.Choice(
                 [str(i) for i, generator_name in enumerate(generator_names, 1)]
             ),
@@ -1214,7 +1211,7 @@ We could not determine the format of the file. What is it?
 
                 try:
                     reader_method = datasource.guess_reader_method_from_path(
-                        path + "." + reader_method_file_extensions[option_selection]
+                        f"{path}.{reader_method_file_extensions[option_selection]}"
                     )["reader_method"]
                 except BatchKwargsError:
                     pass
@@ -1374,17 +1371,7 @@ Would you like to continue?"""
         # bigquery table needs to contain the project id if it differs from the credentials project
         if len(data_asset_name.split(".")) < 3:
             project_id, _, _, _, _, _ = parse_bigquery_url(datasource.engine.url)
-            data_asset_name = "{}.{}".format(project_id, data_asset_name)
-
-        # bigquery also requires special handling
-        bigquery_temp_table = click.prompt(
-            "Great Expectations will create a table to use for "
-            "validation." + os.linesep + "Please enter a name for this table: ",
-            default="SOME_PROJECT.SOME_DATASET.ge_tmp_" + str(uuid.uuid4())[:8],
-        )
-        temp_table_kwargs = {
-            "bigquery_temp_table": bigquery_temp_table,
-        }
+            data_asset_name = f"{project_id}.{data_asset_name}"
 
     # now building the actual batch_kwargs
     if sql_query is None:
@@ -1638,7 +1625,7 @@ Great Expectations is building Data Docs from the data you just profiled!"""
                 cli_message(msg_skipping)
                 return
             else:
-                raise ValueError("Unrecognized option: " + option_selection)
+                raise ValueError(f"Unrecognized option: {option_selection}")
 
             # after getting the arguments from the user, let's try to run profiling again
             # (no dry run this time)

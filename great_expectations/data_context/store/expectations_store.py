@@ -112,7 +112,7 @@ class ExpectationsStore(Store):
         runtime_environment=None,
         store_name=None,
         data_context=None,
-    ):
+    ) -> None:
         self._expectationSuiteSchema = ExpectationSuiteSchema()
         # TODO: refactor so ExpectationStore can have access to DataContext. Currently used by usage_stats messages.
         self._data_context = data_context
@@ -205,7 +205,7 @@ class ExpectationsStore(Store):
             else:
                 print(f"\t{len_keys} keys found:")
                 for key in return_obj["keys"][:10]:
-                    print("\t\t" + str(key))
+                    print(f"		{str(key)}")
             if len_keys > 10:
                 print("\t\t...")
             print()

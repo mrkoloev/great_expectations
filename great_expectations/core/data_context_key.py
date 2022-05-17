@@ -9,18 +9,18 @@ class DataContextKey(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def to_tuple(self):
+    def to_tuple(self) -> None:
         pass
 
     @classmethod
     def from_tuple(cls, tuple_):
         return cls(*tuple_)
 
-    def to_fixed_length_tuple(self):
+    def to_fixed_length_tuple(self) -> None:
         raise NotImplementedError
 
     @classmethod
-    def from_fixed_length_tuple(cls, tuple_):
+    def from_fixed_length_tuple(cls, tuple_) -> None:
         raise NotImplementedError
 
     def __eq__(self, other):
@@ -56,13 +56,13 @@ class DataContextKey(metaclass=ABCMeta):
         return hash(self.to_tuple())
 
     def __repr__(self):
-        return self.__class__.__name__ + "::" + "/".join(self.to_tuple())
+        return f"{self.__class__.__name__}::{'/'.join(self.to_tuple())}"
 
 
 class StringKey(DataContextKey):
     """A simple DataContextKey with just a single string value"""
 
-    def __init__(self, key):
+    def __init__(self, key) -> None:
         self._key = key
 
     def to_tuple(self):
