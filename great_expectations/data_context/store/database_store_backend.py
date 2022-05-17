@@ -41,7 +41,7 @@ class DatabaseStoreBackend(StoreBackend):
         suppress_store_backend_id=False,
         manually_initialize_store_backend_id: str = "",
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(
             fixed_length_key=fixed_length_key,
             suppress_store_backend_id=suppress_store_backend_id,
@@ -249,10 +249,10 @@ class DatabaseStoreBackend(StoreBackend):
         try:
             return self.engine.execute(sel).fetchone()[0]
         except (IndexError, SQLAlchemyError) as e:
-            logger.debug("Error fetching value: " + str(e))
-            raise ge_exceptions.StoreError("Unable to fetch value for key: " + str(key))
+            logger.debug(f"Error fetching value: {str(e)}")
+            raise ge_exceptions.StoreError(f"Unable to fetch value for key: {str(key)}")
 
-    def _set(self, key, value, allow_update=True, **kwargs):
+    def _set(self, key, value, allow_update=True, **kwargs) -> None:
         cols = {k: v for (k, v) in zip(self.key_columns, key)}
         cols["value"] = value
 
@@ -278,7 +278,7 @@ class DatabaseStoreBackend(StoreBackend):
                     f"Integrity error {str(e)} while trying to store key"
                 )
 
-    def _move(self):
+    def _move(self) -> None:
         raise NotImplementedError
 
     def get_url_for_key(self, key):
@@ -297,7 +297,7 @@ class DatabaseStoreBackend(StoreBackend):
         full_url = str(self.engine.url)
         engine_name = full_url.split("://")[0]
         db_name = full_url.split("/")[-1]
-        return engine_name + "://" + db_name + "/" + str(key[0])
+        return f"{engine_name}://{db_name}/{str(key[0])}"
 
     def _has_key(self, key):
         sel = (
@@ -316,7 +316,7 @@ class DatabaseStoreBackend(StoreBackend):
         try:
             return self.engine.execute(sel).fetchone()[0] == 1
         except (IndexError, SQLAlchemyError) as e:
-            logger.debug("Error checking for value: " + str(e))
+            logger.debug(f"Error checking for value: {str(e)}")
             return False
 
     def list_keys(self, prefix=()):
@@ -326,10 +326,11 @@ class DatabaseStoreBackend(StoreBackend):
             .select_from(text("ge_validations_store as t"))
             .where(
                 and_(
+                    True,
                     *(
                         getattr(self._table.columns, key_col) == val
                         for key_col, val in zip(self.key_columns[: len(prefix)], prefix)
-                    )
+                    ),
                 )
             )
         )

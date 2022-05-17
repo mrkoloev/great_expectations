@@ -99,7 +99,7 @@ class MetricProvider(metaclass=MetaMetricProvider):
     default_kwarg_values = {}
 
     @classmethod
-    def _register_metric_functions(cls):
+    def _register_metric_functions(cls) -> None:
         metric_name = getattr(cls, "metric_name", None)
         metric_domain_keys = cls.domain_keys
         metric_value_keys = cls.value_keys
@@ -202,7 +202,7 @@ class MetricProvider(metaclass=MetaMetricProvider):
         metric_name = metric.metric_name
         dependencies = {}
         for metric_fn_type in MetricPartialFunctionTypes:
-            metric_suffix = "." + metric_fn_type.metric_suffix
+            metric_suffix = f".{metric_fn_type.metric_suffix}"
             try:
                 _ = get_metric_provider(metric_name + metric_suffix, execution_engine)
                 has_aggregate_fn = True

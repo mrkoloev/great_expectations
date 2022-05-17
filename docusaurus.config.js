@@ -1,15 +1,17 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 
 const remarkCodeImport = require('remark-code-import')
+const lightCodeTheme = require('prism-react-renderer/themes/vsDark')
 
 module.exports = {
   title: 'Great Expectations',
   tagline: 'Always know what to expect from your data.',
   url: 'https://docs.greatexpectations.io', // Url to your site with no trailing slash
   baseUrl: '/',
+  onDuplicateRoutes: 'warn',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'https://greatexpectations.io/favicon.ico',
+  favicon: 'https://greatexpectations.io/favicon-32x32.png',
   organizationName: 'great-expectations',
   projectName: 'great_expectations',
   plugins: [
@@ -19,16 +21,10 @@ module.exports = {
 
   themeConfig: {
     prism: {
-      theme: require('prism-react-renderer/themes/vsDark')
+      theme: lightCodeTheme
     },
     colorMode: {
       disableSwitch: true
-    },
-    gtag: {
-      // You can also use your "G-" Measurement ID here.
-      trackingID: 'UA-138955219-1',
-      // Optional fields.
-      anonymizeIP: true // Should IPs be anonymized?
     },
     zoomSelector: '.markdown :not(em) > img',
     announcementBar: {
@@ -43,7 +39,7 @@ module.exports = {
     navbar: {
       logo: {
         alt: 'Great Expectations',
-        src: 'img/great-expectations-logo-full-size.png',
+        src: 'img/great-expectations-long-logo.svg',
         href: 'https://greatexpectations.io'
       },
       items: [
@@ -134,35 +130,28 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Superconductive.`
     }
   },
-
-  // themes:[ ],
+  // themes:['@docusaurus/theme-classic'],
   presets: [
     [
       '@docusaurus/preset-classic',
-      {
+      ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           remarkPlugins: [remarkCodeImport],
-          editUrl:
-                        'https://github.com/great-expectations/great_expectations/tree/develop/'
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl: 'https://github.com/great-expectations/great_expectations/tree/develop/'
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css')
         },
-        lastVersion: 'current',
-        versions: {
-          // Example configuration:
-          // <WILL> may have to be fixed
-          current: {
-            label: 'docs',
-            path: 'docs'
-          },
-          '0.13.9': {
-            label: '0.13.9-docs',
-            path: '0.13.9'
-          }
+        gtag: {
+          // You can also use your "G-" Measurement ID here.
+          trackingID: 'UA-138955219-1',
+          // Optional fields.
+          anonymizeIP: true // Should IPs be anonymized?
         }
-      }
+      })
     ]
   ]
 }

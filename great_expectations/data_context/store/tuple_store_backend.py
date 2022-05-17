@@ -35,7 +35,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
         manually_initialize_store_backend_id: str = "",
         base_public_path=None,
         store_name=None,
-    ):
+    ) -> None:
         super().__init__(
             fixed_length_key=fixed_length_key,
             suppress_store_backend_id=suppress_store_backend_id,
@@ -72,7 +72,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
             self.verify_that_key_to_filepath_operation_is_reversible()
             self._fixed_length_key = True
 
-    def _validate_key(self, key):
+    def _validate_key(self, key) -> None:
         super()._validate_key(key)
 
         for key_element in key:
@@ -86,7 +86,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
                         )
                     )
 
-    def _validate_value(self, value):
+    def _validate_value(self, value) -> None:
         if not isinstance(value, str) and not isinstance(value, bytes):
             raise TypeError(
                 "Values in {} must be instances of {} or {}, not {}".format(
@@ -115,7 +115,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
             converted_string = "/".join(key)
 
         if self.filepath_prefix:
-            converted_string = self.filepath_prefix + "/" + converted_string
+            converted_string = f"{self.filepath_prefix}/{converted_string}"
         if self.filepath_suffix:
             converted_string += self.filepath_suffix
         if self.platform_specific_separator:
@@ -165,9 +165,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
             # Convert the template to a regex
             indexed_string_substitutions = re.findall(r"{\d+}", filepath_template)
             tuple_index_list = [
-                "(?P<tuple_index_{}>.*)".format(
-                    i,
-                )
+                f"(?P<tuple_index_{i}>.*)"
                 for i in range(len(indexed_string_substitutions))
             ]
             intermediate_filepath_regex = re.sub(
@@ -186,7 +184,7 @@ class TupleStoreBackend(StoreBackend, metaclass=ABCMeta):
                 tuple_index = int(
                     re.search(r"\d+", indexed_string_substitutions[i]).group(0)
                 )
-                key_element = matches.group("tuple_index_" + str(i))
+                key_element = matches.group(f"tuple_index_{str(i)}")
                 new_key[tuple_index] = key_element
 
             new_key = tuple(new_key)
@@ -241,7 +239,7 @@ class TupleFilesystemStoreBackend(TupleStoreBackend):
         manually_initialize_store_backend_id: str = "",
         base_public_path=None,
         store_name=None,
-    ):
+    ) -> None:
         super().__init__(
             filepath_template=filepath_template,
             filepath_prefix=filepath_prefix,
@@ -372,7 +370,7 @@ class TupleFilesystemStoreBackend(TupleStoreBackend):
 
         return key_list
 
-    def rrmdir(self, mroot, curpath):
+    def rrmdir(self, mroot, curpath) -> None:
         """
         recursively removes empty dirs between curpath and mroot inclusive
         """
@@ -407,7 +405,7 @@ class TupleFilesystemStoreBackend(TupleStoreBackend):
 
         if protocol is None:
             protocol = "file:"
-        url = protocol + "//" + full_path
+        url = f"{protocol}//{full_path}"
         return url
 
     def get_public_url_for_key(self, key, protocol=None):
@@ -457,7 +455,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         base_public_path=None,
         endpoint_url=None,
         store_name=None,
-    ):
+    ) -> None:
         super().__init__(
             filepath_template=filepath_template,
             filepath_prefix=filepath_prefix,
@@ -579,7 +577,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         return s3_object_key
 
-    def _move(self, source_key, dest_key, **kwargs):
+    def _move(self, source_key, dest_key, **kwargs) -> None:
         s3 = self._create_resource()
 
         source_filepath = self._convert_key_to_filepath(source_key)
@@ -633,7 +631,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
                     if s3_object_key.startswith("/"):
                         s3_object_key = s3_object_key[1:]
                 else:
-                    if s3_object_key.startswith(self.prefix + "/"):
+                    if s3_object_key.startswith(f"{self.prefix}/"):
                         s3_object_key = s3_object_key[len(self.prefix) + 1 :]
             if self.filepath_prefix and not s3_object_key.startswith(
                 self.filepath_prefix
@@ -650,15 +648,20 @@ class TupleS3StoreBackend(TupleStoreBackend):
         return key_list
 
     def get_url_for_key(self, key, protocol=None):
-        location = self._create_client().get_bucket_location(Bucket=self.bucket)[
-            "LocationConstraint"
-        ]
+        location = None
         if self.boto3_options.get("endpoint_url"):
             location = self.boto3_options.get("endpoint_url")
-        elif location is None:
-            location = "https://s3.amazonaws.com"
         else:
-            location = "https://s3-" + location + ".amazonaws.com"
+            # build s3 endpoint when no endpoint_url is configured
+
+            location = self._create_client().get_bucket_location(Bucket=self.bucket)[
+                "LocationConstraint"
+            ]
+
+            if location is None:
+                location = "https://s3.amazonaws.com"
+            else:
+                location = f"https://s3-{location}.amazonaws.com"
 
         s3_key = self._convert_key_to_filepath(key)
 
@@ -676,7 +679,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         s3_key = self._convert_key_to_filepath(key)
         # <WILL> What happens if there is a prefix?
         if self.base_public_path[-1] != "/":
-            public_url = self.base_public_path + "/" + s3_key
+            public_url = f"{self.base_public_path}/{s3_key}"
         else:
             public_url = self.base_public_path + s3_key
         return public_url
@@ -754,7 +757,7 @@ class TupleGCSStoreBackend(TupleStoreBackend):
         public_urls=True,
         base_public_path=None,
         store_name=None,
-    ):
+    ) -> None:
         super().__init__(
             filepath_template=filepath_template,
             filepath_prefix=filepath_prefix,
@@ -854,7 +857,7 @@ class TupleGCSStoreBackend(TupleStoreBackend):
             blob.upload_from_string(value, content_type=content_type)
         return gcs_object_key
 
-    def _move(self, source_key, dest_key, **kwargs):
+    def _move(self, source_key, dest_key, **kwargs) -> None:
         from google.cloud import storage
 
         gcs = storage.Client(project=self.project)
@@ -927,7 +930,7 @@ class TupleGCSStoreBackend(TupleStoreBackend):
         else:
             if self.base_public_path:
                 if self.base_public_path[-1] != "/":
-                    path_url = "/" + path
+                    path_url = f"/{path}"
                 else:
                     path_url = path
             else:
@@ -978,7 +981,7 @@ class TupleAzureBlobStoreBackend(TupleStoreBackend):
         suppress_store_backend_id=False,
         manually_initialize_store_backend_id: str = "",
         store_name=None,
-    ):
+    ) -> None:
         super().__init__(
             filepath_template=filepath_template,
             filepath_prefix=filepath_prefix,
@@ -1053,7 +1056,7 @@ class TupleAzureBlobStoreBackend(TupleStoreBackend):
             name_starts_with=self.prefix
         ):
             az_blob_key = os.path.relpath(obj.name)
-            if az_blob_key.startswith(self.prefix + "/"):
+            if az_blob_key.startswith(f"{self.prefix}/"):
                 az_blob_key = az_blob_key[len(self.prefix) + 1 :]
             if self.filepath_prefix and not az_blob_key.startswith(
                 self.filepath_prefix
@@ -1081,7 +1084,7 @@ class TupleAzureBlobStoreBackend(TupleStoreBackend):
         all_keys = self.list_keys()
         return key in all_keys
 
-    def _move(self, source_key, dest_key, **kwargs):
+    def _move(self, source_key, dest_key, **kwargs) -> None:
         source_blob_path = self._convert_key_to_filepath(source_key)
         if not source_blob_path.startswith(self.prefix):
             source_blob_path = os.path.join(self.prefix, source_blob_path)

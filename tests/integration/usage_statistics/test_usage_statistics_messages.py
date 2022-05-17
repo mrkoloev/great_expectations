@@ -10,8 +10,14 @@ from great_expectations.core.usage_statistics.anonymizers.types.base import (
     CLISuiteInteractiveFlagCombinations,
 )
 from great_expectations.data_context import BaseDataContext
+from tests.integration.usage_statistics.example_events.data_context_run_validation_operator import (
+    data_context_run_validation_operator_events,
+)
 from tests.integration.usage_statistics.test_integration_usage_statistics import (
     USAGE_STATISTICS_QA_URL,
+)
+from tests.integration.usage_statistics.usage_stats_event_examples import (
+    data_context_init_with_dependencies,
 )
 
 
@@ -208,7 +214,6 @@ valid_usage_statistics_messages = {
                         },
                         "anonymized_site_index_builder": {
                             "parent_class": "DefaultSiteIndexBuilder",
-                            "show_cta_footer": True,
                         },
                     },
                 ],
@@ -301,7 +306,6 @@ valid_usage_statistics_messages = {
                         },
                         "anonymized_site_index_builder": {
                             "parent_class": "DefaultSiteIndexBuilder",
-                            "show_cta_footer": True,
                         },
                     },
                 ],
@@ -350,6 +354,7 @@ valid_usage_statistics_messages = {
             "data_context_instance_id": "445a8ad1-2bd0-45ce-bb6b-d066afe996dd",
             "ge_version": "0.13.0.manual_test",
         },
+        data_context_init_with_dependencies,
     ],
     "data_asset.validate": [
         {
@@ -1100,6 +1105,7 @@ valid_usage_statistics_messages = {
             "x-forwarded-for": "00.000.00.000, 00.000.000.000",
         },
     ],
+    "data_context.run_validation_operator": data_context_run_validation_operator_events,
     "legacy_profiler.build_suite": [
         {
             "event": "legacy_profiler.build_suite",
@@ -1447,6 +1453,21 @@ valid_usage_statistics_messages = {
             "ge_version": "0.11.5.manual_testing",
         },
     ],
+    "execution_engine.sqlalchemy.connect": [
+        {
+            "event": "execution_engine.sqlalchemy.connect",
+            "event_payload": {
+                "anonymized_name": "6989a7654d0e27470dc01292b6ed0dea",
+                "sqlalchemy_dialect": "postgresql",
+            },
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2020-08-04T00:38:32.664Z",
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.13.0.manual_testing",
+        },
+    ],
     "expectation_suite.add_expectation": [
         {
             "event_payload": {},
@@ -1457,6 +1478,32 @@ valid_usage_statistics_messages = {
             "data_context_id": "00000000-0000-0000-0000-000000000002",
             "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
             "ge_version": "0.13.47.manual_testing",
+            "x-forwarded-for": "00.000.00.000, 00.000.000.000",
+        }
+    ],
+    "data_context.run_profiler_with_dynamic_arguments": [
+        {
+            "event_payload": {},
+            "event": "data_context.run_profiler_with_dynamic_arguments",
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2022-04-21T16:08:28.070Z",
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.14.6.manual_testing",
+            "x-forwarded-for": "00.000.00.000, 00.000.000.000",
+        },
+    ],
+    "data_context.run_profiler_on_data": [
+        {
+            "event_payload": {},
+            "event": "data_context.run_profiler_on_data",
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2022-04-21T16:08:28.070Z",
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.14.8.manual_testing",
             "x-forwarded-for": "00.000.00.000, 00.000.000.000",
         }
     ],
@@ -2497,6 +2544,136 @@ valid_usage_statistics_messages = {
             },
         ],
     ),
+    "profiler.run": [
+        {
+            "event": "profiler.run",
+            "event_payload": {},
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2020-06-25T16:08:28.070Z",
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.14.7.manual_testing",
+            "x-forwarded-for": "00.000.00.000, 00.000.000.000",
+        },
+        {
+            "event": "profiler.run",
+            "event_payload": {
+                "anonymized_name": "5b6c98e19e21e77191fb071bb9e80070",
+                "anonymized_rules": [
+                    {
+                        "anonymized_domain_builder": {
+                            "parent_class": "TableDomainBuilder"
+                        },
+                        "anonymized_expectation_configuration_builders": [
+                            {
+                                "parent_class": "DefaultExpectationConfigurationBuilder",
+                                "expectation_type": "expect_column_pair_values_A_to_be_greater_than_B",
+                            }
+                        ],
+                        "anonymized_name": "5a83f3728393d6519a197cffdccd50ff",
+                        "anonymized_parameter_builders": [
+                            {
+                                "anonymized_name": "9349ed253aba01f4ecf190af61018a11",
+                                "anonymized_class": "dasfj238fefasfa90sdf23j39202f2j2",
+                                "parent_class": "MetricMultiBatchParameterBuilder",
+                            }
+                        ],
+                    },
+                    {
+                        "anonymized_domain_builder": {
+                            "parent_class": "TableDomainBuilder"
+                        },
+                        "anonymized_expectation_configuration_builders": [
+                            {
+                                "parent_class": "DefaultExpectationConfigurationBuilder",
+                                "anonymized_expectation_type": "239asdfjaew832hg20sdjwd9922e9e2u",
+                            }
+                        ],
+                        "anonymized_name": "0bac2cecbb0cf8bb704e86710941434e",
+                        "anonymized_parameter_builders": [
+                            {
+                                "anonymized_name": "b7719efec76c6ebe30230fc1ec023beb",
+                                "parent_class": "MetricMultiBatchParameterBuilder",
+                            }
+                        ],
+                    },
+                ],
+                "config_version": 1.0,
+                "rule_count": 2,
+                "variable_count": 1,
+            },
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2020-06-25T16:08:28.070Z",
+            "event_duration": 123,
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.14.7.manual_testing",
+            "x-forwarded-for": "00.000.00.000, 00.000.000.000",
+        },
+        {
+            "event": "profiler.run",
+            "event_payload": {
+                "anonymized_name": "5b6c98e19e21e77191fb071bb9e80070",
+                "anonymized_rules": [
+                    {
+                        "anonymized_domain_builder": {
+                            "anonymized_class": "d2972bccf7a2a0ff91ba9369a86dcbe1",
+                            "parent_class": "TableDomainBuilder",
+                        },
+                        "anonymized_expectation_configuration_builders": [
+                            {
+                                "anonymized_class": "0d70a2037f19cf1764afad97c7395167",
+                                "anonymized_expectation_type": "c7c23fbf56041786bf024a2407031b27",
+                                "parent_class": "DefaultExpectationConfigurationBuilder",
+                            }
+                        ],
+                        "anonymized_name": "5a83f3728393d6519a197cffdccd50ff",
+                        "anonymized_parameter_builders": [
+                            {
+                                "anonymized_class": "c73849d7016ce7ab68e24465361a717a",
+                                "anonymized_name": "9349ed253aba01f4ecf190af61018a11",
+                                "parent_class": "RegexPatternStringParameterBuilder",
+                            }
+                        ],
+                    },
+                    {
+                        "anonymized_domain_builder": {
+                            "anonymized_class": "df79fd715bf3ea514c3f4e3006025b24",
+                            "parent_class": "__not_recognized__",
+                        },
+                        "anonymized_expectation_configuration_builders": [
+                            {
+                                "anonymized_class": "71128204dee66972b5cfc8851b216508",
+                                "anonymized_expectation_type": "828b498d29af626836697ba1622ca234",
+                                "parent_class": "__not_recognized__",
+                            }
+                        ],
+                        "anonymized_name": "0bac2cecbb0cf8bb704e86710941434e",
+                        "anonymized_parameter_builders": [
+                            {
+                                "anonymized_class": "fcbd493bd096d894cf83506bc23a0729",
+                                "anonymized_name": "5af4c6b6dedc5f9b3b840709e957c4ed",
+                                "parent_class": "__not_recognized__",
+                            }
+                        ],
+                    },
+                ],
+                "config_version": 1.0,
+                "rule_count": 2,
+                "variable_count": 1,
+            },
+            "success": True,
+            "version": "1.0.0",
+            "event_time": "2020-06-25T16:08:28.070Z",
+            "event_duration": 123,
+            "data_context_id": "00000000-0000-0000-0000-000000000002",
+            "data_context_instance_id": "10000000-0000-0000-0000-000000000002",
+            "ge_version": "0.14.7.manual_testing",
+            "x-forwarded-for": "00.000.00.000, 00.000.000.000",
+        },
+    ],
 }
 
 test_messages = []
@@ -2509,8 +2686,12 @@ for message_type, messages in valid_usage_statistics_messages.items():
 
 @pytest.mark.aws_integration
 @pytest.mark.parametrize("message", test_messages, ids=message_test_ids)
-def test_usage_statistics_message(message):
+def test_usage_statistics_message(
+    message: dict, requests_session_with_retries: requests.Session
+):
     """known message formats should be valid"""
-    res = requests.post(USAGE_STATISTICS_QA_URL, json=message, timeout=2)
+    res = requests_session_with_retries.post(
+        USAGE_STATISTICS_QA_URL, json=message, timeout=2
+    )
     assert res.status_code == 201
     assert res.json() == {"event_count": 1}

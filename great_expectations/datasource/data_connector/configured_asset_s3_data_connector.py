@@ -48,7 +48,7 @@ class ConfiguredAssetS3DataConnector(ConfiguredAssetFilePathDataConnector):
         max_keys: int = 1000,
         boto3_options: Optional[dict] = None,
         batch_spec_passthrough: Optional[dict] = None,
-    ):
+    ) -> None:
         """
         ConfiguredAssetDataConnector for connecting to S3.
 
@@ -110,7 +110,7 @@ class ConfiguredAssetS3DataConnector(ConfiguredAssetFilePathDataConnector):
         elif "." in path_parts[-1]:  # File, not folder
             return text
         else:  # Folder, should have trailing /
-            return text.rstrip("/") + "/"
+            return f"{text.rstrip('/')}/"
 
     def build_batch_spec(self, batch_definition: BatchDefinition) -> S3BatchSpec:
         """

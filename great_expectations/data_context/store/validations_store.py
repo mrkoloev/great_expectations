@@ -94,7 +94,9 @@ class ValidationsStore(Store):
 
     _key_class = ValidationResultIdentifier
 
-    def __init__(self, store_backend=None, runtime_environment=None, store_name=None):
+    def __init__(
+        self, store_backend=None, runtime_environment=None, store_name=None
+    ) -> None:
         self._expectationSuiteValidationResultSchema = (
             ExpectationSuiteValidationResultSchema()
         )
@@ -190,7 +192,7 @@ class ValidationsStore(Store):
             else:
                 print(f"\t{len_keys} keys found:")
                 for key in return_obj["keys"][:10]:
-                    print("\t\t" + str(key))
+                    print(f"		{str(key)}")
             if len_keys > 10:
                 print("\t\t...")
             print()
